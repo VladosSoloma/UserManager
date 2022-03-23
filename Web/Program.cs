@@ -3,18 +3,14 @@ using Microsoft.Identity.Web.UI;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Presentation;
+using Services.Abstractions;
+using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var config = builder.Configuration;
-var initialScopes = config.GetValue<string>("DownstreamApi:Scopes")?.Split(' ');
-builder.Services.AddMicrosoftIdentityWebAppAuthentication(builder.Configuration)
-    .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
-    .AddMicrosoftGraph(
-        config["DownstreamApi:BaseUrl"],
-        config.GetValue<string>("DownstreamApi:Scopes"))
-    .AddInMemoryTokenCaches();
+builder.Services.AddMicrosoftIdentityWebAppAuthentication(builder.Configuration);
 builder.Services.AddControllersWithViews(opts =>
 {
     var policy = new AuthorizationPolicyBuilder()
@@ -22,7 +18,14 @@ builder.Services.AddControllersWithViews(opts =>
         .Build();
     opts.Filters.Add(new AuthorizeFilter(policy));
 }).AddMicrosoftIdentityUI().AddApplicationPart(typeof(PresentationReference).Assembly);
-
+builder.Services.AddAuthorization(policies =>
+{
+    policies.AddPolicy("Admin", p =>
+    {
+        p.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Admin");
+    });
+});
+builder.Services.AddScoped<IUserService, UserService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

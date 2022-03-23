@@ -8,6 +8,6 @@ namespace Services.Abstractions
         Task<IEnumerable<UserDto>> GetUsersAsync();
         Task<UserDto> AddUserAsync(RegisterUserDto user);
         Task<UserDto> UpdateUserAsync(UpdateUserDto user);
-        void DeleteUserAsync(string userId);
+        Task DeleteUserAsync(string userId);
     }
 }
