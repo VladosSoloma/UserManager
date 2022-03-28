@@ -9,7 +9,6 @@ using Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var config = builder.Configuration;
 builder.Services.AddMicrosoftIdentityWebAppAuthentication(builder.Configuration);
 builder.Services.AddControllersWithViews(opts =>
 {

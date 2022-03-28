@@ -2,7 +2,6 @@
 using Contracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
-using Microsoft.Identity.Client;
 using Services.Abstractions;
 
 namespace Services
@@ -10,10 +9,13 @@ namespace Services
     public class UserService : IUserService
     {
         private readonly GraphServiceClient _graphServiceClient;
-
+        private readonly string _clientId;
+        private readonly string _principalId;
         public UserService(IConfiguration configuration)
         {
+            _principalId = configuration["AzureAd:ServicePrincipalId"];
             var clientId = configuration["AzureAd:ClientId"];
+            _clientId = clientId;
             var tenantId = configuration["AzureAd:TenantId"];
             var clientSecret = configuration["AzureAd:ClientSecret"];
             var scopes = new[] { configuration["AzureAd:Scopes"] };
@@ -42,13 +44,13 @@ namespace Services
                 Mail = user.Mail,
                 Identities = new List<ObjectIdentity>()
                 {
-                    new ObjectIdentity
+                    new()
                     {
                         SignInType = "userName",
                         Issuer = "solomaorg.onmicrosoft.com",
                         IssuerAssignedId = $"{user.GivenName}_{user.Surname}"
                     },
-                    new ObjectIdentity
+                    new()
                     {
                         SignInType = "emailAddress",
                         Issuer = "solomaorg.onmicrosoft.com",
@@ -62,13 +64,27 @@ namespace Services
                 },
                 PasswordPolicies = "DisablePasswordExpiration"
             };
-            var result = await _graphServiceClient.Users.Request().AddAsync(adUser);
+            var dbUser = await _graphServiceClient.Users.Request().AddAsync(adUser);
+
+            var servicePrincipals = await _graphServiceClient.ServicePrincipals.Request()
+                .Filter($"appId eq '{_clientId}'")
+                .GetAsync();
+            var appRoles = servicePrincipals.Single().AppRoles;
+            var appRoleAssignment = new AppRoleAssignment
+            {
+                PrincipalId = Guid.Parse(dbUser.Id),
+                ResourceId = Guid.Parse(_principalId),
+                AppRoleId = appRoles.SingleOrDefault(r => r.Value == "User")?.Id
+            };
+            await _graphServiceClient.Users[dbUser.Id]
+                .AppRoleAssignments.Request()
+                .AddAsync(appRoleAssignment);
             return new UserDto()
             {
-                Id = result.Id,
-                DisplayName = result.DisplayName,
-                GivenName = result.GivenName,
-                Surname = result.Surname,
+                Id = dbUser.Id,
+                DisplayName = dbUser.DisplayName,
+                GivenName = dbUser.GivenName,
+                Surname = dbUser.Surname,
             };
         }
 
@@ -80,26 +96,6 @@ namespace Services
         public async Task<IEnumerable<UserDto>> GetUsersAsync()
         {
             var users = await _graphServiceClient.Users.Request().GetAsync();
-            var test = await _graphServiceClient.ServicePrincipals.Request()
-                .Filter("appId eq '3229905c-3379-4d7d-8b84-146f8e80e7fd'")
-                .GetAsync();
-            var appRoles = test[0].AppRoles;
-
-            foreach (var role in appRoles)
-            {
-                if (role.Value == "User1")
-                {
-                    var appRoleAssignment = new AppRoleAssignment
-                    {
-                        PrincipalId = Guid.Parse("db38ae42-d20f-464a-9f19-9252b8e85006"),
-                        ResourceId = Guid.Parse("a0668e5d-f5ca-425e-9bcf-e95f89edb6a8"),
-                        AppRoleId = role.Id
-                    };
-                    var testUser = await _graphServiceClient.Users["db38ae42-d20f-464a-9f19-9252b8e85006"]
-                        .AppRoleAssignments.Request()
-                        .AddAsync(appRoleAssignment);
-                }
-            }
             return users.Select(u => new UserDto()
             {
                 Id = u.Id, Mail = u.Mail, DisplayName = u.DisplayName, GivenName = u.GivenName, Surname = u.Surname

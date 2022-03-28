@@ -13,5 +13,6 @@ namespace Contracts
         public string Mail { get; set; }
         public string GivenName { get; set; }
         public string Surname { get; set; }
+        public IEnumerable<string> Roles { get; set; }
     }
 }
