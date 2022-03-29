@@ -14,7 +14,7 @@ namespace Services
         private readonly string _principalId;
         public UserService(IConfiguration configuration)
         {
-            _domain = configuration["AzureAd:Domain"],
+            _domain = configuration["AzureAd:Domain"];
             _principalId = configuration["AzureAd:ServicePrincipalId"];
             var clientId = configuration["AzureAd:ClientId"];
             _clientId = clientId;
