@@ -9,10 +9,12 @@ namespace Services
     public class UserService : IUserService
     {
         private readonly GraphServiceClient _graphServiceClient;
+        private readonly string _domain;
         private readonly string _clientId;
         private readonly string _principalId;
         public UserService(IConfiguration configuration)
         {
+            _domain = configuration["AzureAd:Domain"],
             _principalId = configuration["AzureAd:ServicePrincipalId"];
             var clientId = configuration["AzureAd:ClientId"];
             _clientId = clientId;
@@ -47,13 +49,13 @@ namespace Services
                     new()
                     {
                         SignInType = "userName",
-                        Issuer = "solomaorg.onmicrosoft.com",
+                        Issuer = _domain,
                         IssuerAssignedId = $"{user.GivenName}_{user.Surname}"
                     },
                     new()
                     {
                         SignInType = "emailAddress",
-                        Issuer = "solomaorg.onmicrosoft.com",
+                        Issuer = _domain,
                         IssuerAssignedId = user.Mail
                     }
                 },
