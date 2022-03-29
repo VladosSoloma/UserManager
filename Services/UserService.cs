@@ -60,7 +60,7 @@ namespace Services
                 PasswordProfile = new PasswordProfile
                 {
                     Password = user.Password,
-                    ForceChangePasswordNextSignIn = true
+                    ForceChangePasswordNextSignIn = false
                 },
                 PasswordPolicies = "DisablePasswordExpiration"
             };
