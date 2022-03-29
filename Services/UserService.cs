@@ -1,5 +1,7 @@
-﻿using Azure.Identity;
+﻿using System.Security.Claims;
+using Azure.Identity;
 using Contracts;
+using Domain.Exceptions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Graph;
 using Services.Abstractions;
@@ -90,8 +92,13 @@ namespace Services
             };
         }
 
-        public async Task DeleteUserAsync(string userId)
+        public async Task DeleteUserAsync(ClaimsPrincipal user, string userId)
         {
+            var id = user.Claims.Single(r => r.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier");
+            var me = await _graphServiceClient.Users[id.Value].Request()
+                .GetAsync();
+            if (me.Id == userId)
+                throw new BadRequestException("Cannot delete yourself");
             await _graphServiceClient.Users[userId].Request().DeleteAsync();
         }
 

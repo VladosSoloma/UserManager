@@ -30,7 +30,7 @@ namespace Presentation.Controllers
 
         public async Task<IActionResult> Delete(string id)
         {
-            await _userService.DeleteUserAsync(id);
+            await _userService.DeleteUserAsync(HttpContext.User, id);
             return RedirectToAction("Users");
         }
 
