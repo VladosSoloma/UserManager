@@ -10,7 +10,7 @@ namespace Presentation.Controllers
     [AllowAnonymous]
     public class AccountController : Controller
     {
-        public IActionResult SignOut()
+        public new IActionResult SignOut()
         {
             return SignOut(new AuthenticationProperties { RedirectUri = "" },
                 CookieAuthenticationDefaults.AuthenticationScheme, OpenIdConnectDefaults.AuthenticationScheme);

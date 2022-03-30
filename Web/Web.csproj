@@ -6,9 +6,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>cadd3450-eea3-41b6-a9bd-ad2b6561f61e</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <ApplicationInsightsResourceId>/subscriptions/0b102564-b30e-4be9-b8b3-ab47577efe5a/resourcegroups/UserManagerApp/providers/Microsoft.Insights/components/AdminConsole</ApplicationInsightsResourceId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.20.0" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.15.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.3" />
     <PackageReference Include="Microsoft.Identity.Web" Version="1.23.0" />
@@ -16,6 +19,9 @@
     <PackageReference Include="Microsoft.Identity.Web.UI" Version="1.23.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.2" />
+    <PackageReference Include="Serilog" Version="2.10.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="6.0.0-dev-00265" />
+    <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="3.1.1-dev-00170" />
   </ItemGroup>
 
   <ItemGroup>
