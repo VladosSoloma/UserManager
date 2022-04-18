@@ -68,16 +68,8 @@ namespace Services
                 },
                 PasswordPolicies = "DisablePasswordExpiration"
             };
-            User dbUser;
-            try
-            {
-                dbUser = await _graphServiceClient.Users.Request().AddAsync(adUser);
-            }
-            catch (Exception ex)
-            {
-                throw new ConflictException();
-            }
 
+            var dbUser = await _graphServiceClient.Users.Request().AddAsync(adUser);
             var servicePrincipals = await _graphServiceClient.ServicePrincipals.Request()
                 .Filter($"appId eq '{_clientId}'")
                 .GetAsync();
