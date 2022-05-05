@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Logging;
 using Web.Models;
 
-namespace Web.Controllers
+namespace Presentation.Controllers
 {
+
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -12,9 +15,10 @@ namespace Web.Controllers
         {
             _logger = logger;
         }
-
+        [AllowAnonymous]
         public IActionResult Index()
         {
+            var user = HttpContext.User;
             return View();
         }
 
@@ -23,6 +27,7 @@ namespace Web.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
