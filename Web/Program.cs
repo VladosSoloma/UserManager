@@ -30,7 +30,10 @@ try
     builder.Services.AddAuthorization(policies =>
     {
         policies.AddPolicy("Admin",
-            p => { p.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Admin"); });
+            p =>
+            {
+                p.RequireClaim("http://schemas.microsoft.com/ws/2008/06/identity/claims/role", "Admin");
+            });
     });
     builder.Services.AddScoped<IUserService, UserService>();
     var app = builder.Build();
